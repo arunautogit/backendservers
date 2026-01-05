@@ -18,6 +18,47 @@ const io = new Server(server, {
 // rooms[roomCode] = { players: [], gameState: {} }
 const rooms = {};
 
+// --- SIMPLE FILE DATABASE ---
+const fs = require('fs');
+const path = require('path');
+const DB_FILE = path.join(__dirname, 'database.json');
+
+// Memory Cache
+let db = { users: {} };
+
+// Load DB
+function loadDB() {
+    if (fs.existsSync(DB_FILE)) {
+        try {
+            db = JSON.parse(fs.readFileSync(DB_FILE, 'utf8'));
+        } catch (e) {
+            console.error("DB Load Error:", e);
+            db = { users: {} };
+        }
+    } else {
+        saveDB(); // Create if missing
+    }
+}
+loadDB();
+
+// Save DB
+function saveDB() {
+    fs.writeFileSync(DB_FILE, JSON.stringify(db, null, 2));
+}
+
+// Helper: Get or Create User
+function getUser(email) {
+    if (!db.users[email]) {
+        db.users[email] = {
+            coins: 100, // Default Start
+            history: []
+        };
+        saveDB();
+    }
+    return db.users[email];
+}
+
+
 // Utils
 function generateRoomCode() {
     return Math.random().toString(36).substring(2, 8).toUpperCase();
@@ -79,46 +120,85 @@ io.on('connection', (socket) => {
         console.log(`Player joined ${roomCode}: ${email}`);
     });
 
-    socket.on('start_game', ({ roomCode }) => {
+    socket.on('start_game', ({ roomCode, links }) => {
         const room = rooms[roomCode];
         if (!room) return;
-        // Verify host (first player) sent start?
-        // For now assume logic is handled on client to only show start btn to host
 
         room.started = true;
-        // Initialize basic game state if needed, or just let clients sync
+        // Broadcast game start with the BOARD LAYOUT (links) so everyone matches
         io.to(roomCode).emit('game_started', {
-            players: room.players
+            players: room.players,
+            links: links // Syncs snakes/ladders
         });
-        console.log(`Game started in room ${roomCode}`);
+        console.log(`[GAME START] Room: ${roomCode}, Links generated`);
+
+        // Log all players start
+        room.players.forEach(p => {
+            console.log(`[LOG] Room ${roomCode}: Player ${p.email} (${p.id}) started game.`);
+        });
     });
 
-    // Game Events Relay
+    // Game Events Relay with Logging
     socket.on('game_action', ({ roomCode, type, data }) => {
+        // Log the action
+        const room = rooms[roomCode];
+        let pName = socket.id;
+        if (room) {
+            const p = room.players.find(pl => pl.id === socket.id);
+            if (p) pName = `${p.email} (P${p.number})`;
+        }
+
+        console.log(`[ACTIVITY] Room ${roomCode} | User: ${pName} | Action: ${type} | Data: ${JSON.stringify(data)}`);
+
         // Broadcast action to everyone ELSE in the room
         socket.to(roomCode).emit('game_action', { type, data, from: socket.id });
     });
 
-    // Sync entire state periodically or on specific milestones if needed
-    // socket.on('sync_state', ...)
+    // socket.on('sync_state', ...) - Not implemented yet, relying on determinism
+
+    // --- WALLET / DB EVENTS ---
+    socket.on('get_wallet', (email) => {
+        if (!email) return;
+        const user = getUser(email);
+        socket.emit('wallet_update', { coins: user.coins });
+    });
+
+    socket.on('update_wallet', ({ email, amount, reason }) => {
+        if (!email) return;
+        const user = getUser(email);
+
+        // Calculate diff for history consistency or trust client absolute?
+        // Trusting client sent "new total" is risky. Better to send "change amount" (+50, -10)
+        // BUT current client logic was absolute. Let's switch to RELATIVE info if possible, 
+        // OR just update absolute but log the diff.
+        // For simplicity with current request: "record coins earned and spent"
+
+        const diff = amount - user.coins;
+        user.coins = amount;
+
+        user.history.push({
+            action: reason || 'unknown',
+            diff: diff,
+            total: user.coins,
+            timestamp: new Date().toISOString()
+        });
+
+        saveDB();
+        socket.emit('wallet_update', { coins: user.coins });
+        console.log(`[WALLET] ${email}: ${diff > 0 ? '+' : ''}${diff} (${reason}) => Total: ${user.coins}`);
+    });
 
     socket.on('disconnect', () => {
-        console.log('User disconnected:', socket.id);
-        // Find room and remove player?
-        // handling dropouts in simple implementation: just mark offline or ignore
+        console.log('[DISCONNECT] User:', socket.id);
         for (const code in rooms) {
             const room = rooms[code];
             const pIdx = room.players.findIndex(p => p.id === socket.id);
             if (pIdx !== -1) {
-                // If game hasn't started, remove them
+                console.log(`[LOG] Player left Room ${code}: ${room.players[pIdx].email}`);
                 if (!room.started) {
                     room.players.splice(pIdx, 1);
                     io.to(code).emit('player_list', room.players);
-                    // If host left and room empty, delete room
                     if (room.players.length === 0) delete rooms[code];
-                } else {
-                    // Game started, maybe mark disconnected?
-                    // io.to(code).emit('player_left', { playerNum: room.players[pIdx].number });
                 }
                 break;
             }
@@ -142,4 +222,6 @@ server.listen(PORT, () => {
         }
     }
     console.log(`===============================\n`);
+    // Create DB file if needed check
+    if (!fs.existsSync(DB_FILE)) saveDB();
 });
