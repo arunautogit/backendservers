@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>6th English — Taro's Reward | HARD Quiz</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;900&display=swap');
+  *{margin:0;padding:0;box-sizing:border-box}
+  :root{
+    --bg:#0d0d1a;--card:#161628;--border:#2a2a4a;
+    --accent:#ef4444;--text:#e8e8ff;--muted:#6b6b9a;
+    --correct:#22c55e;--wrong:#ef4444;
+  }
+  body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
+  .stars{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0}
+  .star{position:absolute;border-radius:50%;background:#fff;animation:twinkle var(--d,3s) infinite alternate}
+  @keyframes twinkle{0%{opacity:.1}100%{opacity:.8}}
+  .container{position:relative;z-index:1;max-width:860px;margin:0 auto;padding:20px}
+  header{text-align:center;padding:30px 0 20px}
+  .badge{display:inline-block;background:var(--accent);color:#000;font-weight:900;font-size:.75rem;padding:4px 14px;border-radius:50px;letter-spacing:2px;text-transform:uppercase;margin-bottom:12px}
+  h1{font-size:2rem;font-weight:900;background:linear-gradient(135deg,var(--accent),#fff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+  .meta{color:var(--muted);font-size:.9rem;margin-top:6px}
+  .progress-wrap{background:var(--border);border-radius:50px;height:8px;margin:24px 0 8px;overflow:hidden}
+  .progress-bar{height:100%;background:linear-gradient(90deg,var(--accent),#fff);border-radius:50px;transition:width .5s ease;width:0%}
+  .progress-txt{display:flex;justify-content:space-between;color:var(--muted);font-size:.8rem;margin-bottom:20px}
+  .card{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:30px;margin-bottom:20px;position:relative;backdrop-filter:blur(10px)}
+  .card::before{content:'';position:absolute;inset:0;border-radius:20px;background:linear-gradient(135deg,rgba(255,255,255,.03),transparent);pointer-events:none}
+  .q-type-badge{display:inline-block;font-size:.7rem;font-weight:600;padding:3px 10px;border-radius:50px;border:1px solid var(--accent);color:var(--accent);margin-bottom:12px;letter-spacing:1px;text-transform:uppercase}
+  .q-num{color:var(--muted);font-size:.85rem;margin-bottom:6px}
+  .q-text{font-size:1.1rem;font-weight:600;line-height:1.7;margin-bottom:20px}
+  .choices{display:grid;gap:10px}
+  .choice{background:rgba(255,255,255,.04);border:1.5px solid var(--border);border-radius:12px;padding:14px 18px;cursor:pointer;font-size:.95rem;transition:all .25s;display:flex;align-items:center;gap:12px}
+  .choice:hover{border-color:var(--accent);background:rgba(255,255,255,.08);transform:translateX(4px)}
+  .choice.correct{border-color:var(--correct)!important;background:rgba(34,197,94,.12)!important;color:var(--correct)}
+  .choice.wrong{border-color:var(--wrong)!important;background:rgba(239,68,68,.12)!important;color:var(--wrong)}
+  .choice-letter{width:28px;height:28px;border-radius:50%;background:var(--border);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.8rem;flex-shrink:0}
+  .feedback{display:none;margin-top:14px;padding:12px 16px;border-radius:10px;font-size:.9rem;font-weight:600}
+  .feedback.show{display:block}
+  .feedback.ok{background:rgba(34,197,94,.15);color:var(--correct);border:1px solid rgba(34,197,94,.3)}
+  .feedback.err{background:rgba(239,68,68,.15);color:var(--wrong);border:1px solid rgba(239,68,68,.3)}
+  .timer-wrap{display:flex;align-items:center;gap:10px;margin-bottom:20px;justify-content:flex-end}
+  .timer{background:var(--card);border:1px solid var(--border);border-radius:50px;padding:6px 16px;font-size:.9rem;font-weight:700;color:var(--accent);display:flex;align-items:center;gap:6px}
+  .timer.warn{color:#f59e0b!important;border-color:#f59e0b}
+  .timer.danger{color:var(--wrong)!important;border-color:var(--wrong);animation:pulse .5s infinite}
+  @keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.05)}}
+  .nav{display:flex;gap:12px;justify-content:space-between;margin-top:20px}
+  .btn{padding:12px 28px;border-radius:50px;border:none;font-family:'Outfit',sans-serif;font-weight:700;font-size:.95rem;cursor:pointer;transition:all .25s}
+  .btn-primary{background:linear-gradient(135deg,var(--accent),#fff4);color:#000}
+  .btn-primary:hover{transform:scale(1.05);box-shadow:0 0 20px var(--accent)50}
+  .btn-ghost{background:transparent;border:1.5px solid var(--border);color:var(--text)}
+  .btn-ghost:hover{border-color:var(--accent);color:var(--accent)}
+  .screen{display:none}
+  .screen.active{display:block}
+  /* Reward */
+  .reward-overlay{position:fixed;inset:0;z-index:999;pointer-events:none;display:flex;align-items:center;justify-content:center}
+  .reward-text{font-size:3.5rem;font-weight:900;opacity:0;transform:scale(.5);transition:all .4s cubic-bezier(.34,1.56,.64,1);text-shadow:0 0 30px currentColor}
+  .reward-text.show{opacity:1;transform:scale(1)}
+  .reward-text.hide{opacity:0;transform:scale(2)}
+  .confetti{position:fixed;top:0;pointer-events:none;z-index:998}
+  /* Score Screen */
+  .score-card{text-align:center;padding:40px}
+  .score-circle{width:160px;height:160px;border-radius:50%;border:6px solid var(--accent);margin:0 auto 24px;display:flex;flex-direction:column;align-items:center;justify-content:center;background:radial-gradient(circle,rgba(255,255,255,.05),transparent)}
+  .score-num{font-size:2.8rem;font-weight:900;color:var(--accent)}
+  .score-label{color:var(--muted);font-size:.85rem}
+  .stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin:24px 0}
+  .stat{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px;text-align:center}
+  .stat-val{font-size:1.6rem;font-weight:900}
+  .stat-key{font-size:.75rem;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-top:4px}
+  .intro-card{text-align:center;padding:40px 30px}
+  .level-icon{font-size:4rem;margin-bottom:16px}
+  .intro-card h2{font-size:1.8rem;font-weight:900;margin-bottom:8px}
+  .intro-card p{color:var(--muted);margin-bottom:24px;line-height:1.6}
+  .info-chips{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-bottom:28px}
+  .chip{background:rgba(255,255,255,.06);border:1px solid var(--border);border-radius:50px;padding:6px 16px;font-size:.85rem}
+</style>
+</head>
+<body>
+<!-- Stars background -->
+<div class="stars" id="stars"></div>
+<!-- Reward overlay -->
+<div class="reward-overlay" id="rewardOverlay">
+  <div class="reward-text" id="rewardText"></div>
+</div>
+<!-- Confetti canvas -->
+<canvas class="confetti" id="confettiCanvas"></canvas>
+
+<div class="container">
+  <!-- Intro Screen -->
+  <div class="screen active" id="introScreen">
+    <header>
+      <div class="badge">HARD LEVEL</div>
+      <h1>6th English</h1>
+      <p class="meta">Taro's Reward</p>
+    </header>
+    <div class="card intro-card">
+      <div class="level-icon" id="levelIcon"></div>
+      <h2>HARD Quiz</h2>
+      <p>Test your knowledge with 100 questions covering various question types. Answer carefully and earn rewards for every correct answer!</p>
+      <div class="info-chips">
+        <span class="chip">📝 100 Questions</span>
+        <span class="chip">⏱️ Timed</span>
+        <span class="chip">🏆 Reward Animations</span>
+        <span class="chip">🎯 Mixed Types</span>
+      </div>
+      <button class="btn btn-primary" onclick="startQuiz()" style="font-size:1.1rem;padding:14px 40px">Start Quiz 🚀</button>
+    </div>
+  </div>
+
+  <!-- Quiz Screen -->
+  <div class="screen" id="quizScreen">
+    <header>
+      <div class="badge">HARD</div>
+      <div class="meta">6th English · Taro's Reward</div>
+    </header>
+    <div class="progress-wrap"><div class="progress-bar" id="progBar"></div></div>
+    <div class="progress-txt">
+      <span id="progTxt">Question 1 of 100</span>
+      <span id="scoreDisp">Score: 0</span>
+    </div>
+    <div class="timer-wrap">
+      <div class="timer" id="timerEl">⏱️ <span id="timerNum">30</span>s</div>
+    </div>
+    <div class="card" id="questionCard">
+      <div class="q-type-badge" id="qType"></div>
+      <div class="q-num" id="qNum"></div>
+      <div class="q-text" id="qText"></div>
+      <div class="choices" id="choices"></div>
+      <div class="feedback" id="feedback"></div>
+    </div>
+    <div class="nav">
+      <button class="btn btn-ghost" onclick="prevQ()" id="prevBtn">← Previous</button>
+      <button class="btn btn-primary" onclick="nextQ()" id="nextBtn">Next →</button>
+    </div>
+  </div>
+
+  <!-- Score Screen -->
+  <div class="screen" id="scoreScreen">
+    <div class="card score-card">
+      <div class="badge">HARD COMPLETE!</div>
+      <br>
+      <div class="score-circle">
+        <div class="score-num" id="finalScore">0</div>
+        <div class="score-label">out of 100</div>
+      </div>
+      <div id="resultMsg" style="font-size:1.3rem;font-weight:700;margin-bottom:16px"></div>
+      <div class="stats-grid">
+        <div class="stat"><div class="stat-val" id="stCorr" style="color:var(--correct)">0</div><div class="stat-key">Correct</div></div>
+        <div class="stat"><div class="stat-val" id="stWrong" style="color:var(--wrong)">0</div><div class="stat-key">Wrong</div></div>
+        <div class="stat"><div class="stat-val" id="stPct" style="color:var(--accent)">0%</div><div class="stat-key">Score</div></div>
+      </div>
+      <div style="display:flex;gap:12px;justify-content:center">
+        <button class="btn btn-ghost" onclick="location.reload()">🔄 Retry</button>
+        <button class="btn btn-primary" onclick="window.close()">✅ Done</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const QUESTIONS=[{"type": "Spell Check", "q": "Which of these is spelled <b>correctly</b>?", "choices": ["photosynthesis", "fotosynthesis", "phothosynthesis", "photosynthasis"], "ans": 0, "exp": "'photosynthesis' is the correct spelling."}, {"type": "Antonym", "q": "Choose the word <b>opposite</b> in meaning to '<b>selfish</b>':", "choices": ["ordinary", "generous", "punishment", "cruel"], "ans": 1, "exp": "The antonym of 'selfish' is 'generous'."}, {"type": "MCQ (5 choices)", "q": "Which layer of the Earth is the outermost?", "choices": ["Crust", "Mantle", "Outer Core", "Inner Core", "Lithosphere"], "ans": 0, "exp": "The crust (or lithosphere) is the outermost layer."}, {"type": "True/False", "q": "True or False: Water is a compound.", "choices": ["True", "False"], "ans": 0, "exp": "This statement is True."}, {"type": "Assertion & Reasoning", "q": "<b>Assertion & Reasoning:</b><br>Assertion (A): Iron is a good conductor of electricity.\nReason (R): Metals have free electrons that carry electric current.", "choices": ["Both A and R are true and R is the correct explanation of A", "A is false but R is true", "Both A and R are false", "A is true but R is false"], "ans": 0, "exp": "Both A and R are true and R is the correct explanation of A"}, {"type": "True/False", "q": "True or False: The Sun is a planet.", "choices": ["True", "False"], "ans": 1, "exp": "This statement is False."}, {"type": "Assertion & Reasoning", "q": "<b>Assertion & Reasoning:</b><br>Assertion (A): Pure water is a good conductor of electricity.\nReason (R): Pure water lacks ions to carry current.", "choices": ["Both A and R are false", "A is false but R is true", "Both A and R are true", "A is true but R is false"], "ans": 1, "exp": "A is false but R is true"}, {"type": "MCQ (5 choices)", "q": "Which of the following is NOT a renewable energy source?", "choices": ["Solar", "Wind", "Coal", "Hydro", "Biomass"], "ans": 2, "exp": "Coal is a non-renewable fossil fuel."}, {"type": "MCQ (5 choices)", "q": "Which one of the following is a PHYSICAL change?", "choices": ["Cutting paper", "Burning wood", "Rusting iron", "Cooking food", "Souring milk"], "ans": 0, "exp": "Cutting paper is a physical change; shape changes but not chemical composition."}, {"type": "Reading", "q": "<i>Passage:</i> Mahatma Gandhi was born on October 2, 1869. He is called the Father of the Nation. He led India's independence movement through non-violence and civil disobedience. His philosophy of 'Ahimsa' (non-violence) inspired movements around the world.<br><br><b>Q: Gandhi's philosophy of non-violence is called _____.</b>", "choices": ["Dharma", "Karma", "Satyagraha", "Ahimsa"], "ans": 3, "exp": "Answer: Ahimsa"}, {"type": "Assertion & Reasoning", "q": "<b>Assertion & Reasoning:</b><br>Assertion (A): Sound requires a medium to travel.\nReason (R): Sound is a mechanical wave.", "choices": ["A is false but R is true", "Both A and R are true and R is the correct explanation of A", "A is true but R is false", "Both A and R are false"], "ans": 1, "exp": "Both A and R are true and R is the correct explanation of A"}, {"type": "MCQ", "q": "Neighbours who tried to use the waterfall got only _____.", "choices": ["wine", "sake", "cold water", "nothing"], "ans": 2, "exp": "The correct answer is: cold water"}, {"type": "True/False", "q": "True or False: Fractions can be added only when denominators are same.", "choices": ["True", "False"], "ans": 0, "exp": "This statement is True."}, {"type": "MCQ (5 choices)", "q": "Which property allows iron to be used for making tools?", "choices": ["Hardness", "Ductility", "Malleability", "Conductivity", "Lustre"], "ans": 0, "exp": "Hardness makes iron suitable for cutting tools."}, {"type": "Fill-in-Blank", "q": "Fill in the blank: The currency of India is the ___.", "choices": ["Dollar", "Rupee", "Pound", "Euro"], "ans": 1, "exp": "The correct word is: Rupee"}, {"type": "Assertion & Reasoning", "q": "<b>Assertion & Reasoning:</b><br>Assertion (A): Plants need sunlight to make food.\nReason (R): Sunlight is used in photosynthesis.", "choices": ["Both A and R are true and R is the correct explanation of A", "A is true but R is false", "Both A and R are true but R is NOT the correct explanation", "A is false but R is true"], "ans": 0, "exp": "Both A and R are true and R is the correct explanation of A"}, {"type": "Antonym", "q": "Choose the word <b>opposite</b> in meaning to '<b>magical</b>':", "choices": ["generous", "ordinary", "punishment", "cruel"], "ans": 1, "exp": "The antonym of 'magical' is 'ordinary'."}, {"type": "Synonym", "q": "Choose the word closest in meaning to '<b>selfish</b>':", "choices": ["magical", "kind", "reward", "greedy"], "ans": 3, "exp": "'selfish' is synonymous with 'greedy'."}, {"type": "MCQ (5 choices)", "q": "Which of these is a PRIMARY source of history?", "choices": ["Inscriptions", "Textbooks", "Novels", "News articles", "Encyclopaedia"], "ans": 0, "exp": "Inscriptions are primary sources written at the time of the event."}, {"type": "True/False", "q": "True or False: Silk is a natural fibre.", "choices": ["True", "False"], "ans": 0, "exp": "This statement is True."}, {"type": "Antonym", "q": "Choose the word <b>opposite</b> in meaning to '<b>kind</b>':", "choices": ["cruel", "punishment", "generous", "ordinary"], "ans": 0, "exp": "The antonym of 'kind' is 'cruel'."}, {"type": "Reading", "q": "<i>Passage:</i> The lion is known as the King of the Jungle. It is a carnivore and lives in grasslands and savannas. Lions live in groups called prides. Female lions (lionesses) do most of the hunting. A lion's roar can be heard from 8 kilometres away.<br><br><b>Q: Lions are classified as _____.</b>", "choices": ["carnivores", "omnivores", "herbivores", "scavengers"], "ans": 0, "exp": "Answer: carnivores"}, {"type": "Fill-in-Blank", "q": "Fill in the blank: 60 minutes = ___ hour.", "choices": ["2", "12", "1", "30"], "ans": 2, "exp": "The correct word is: 1"}, {"type": "MCQ (5 choices)", "q": "Who among these is NOT a Buddhist concept?", "choices": ["Nirvana", "Ahimsa", "Karma", "Samsara", "Jihad"], "ans": 4, "exp": "Jihad is an Islamic concept, not Buddhist."}, {"type": "Match", "q": "Match: Equator → 0° latitude", "choices": ["90°N latitude", "180° longitude", "0° latitude", "23.5°N latitude"], "ans": 2, "exp": "Correct match: 0° latitude"}, {"type": "Fill-in-Blank", "q": "Fill in the blank: The natural satellite of Earth is the ___.", "choices": ["Moon", "Mars", "Sun", "Venus"], "ans": 0, "exp": "The correct word is: Moon"}, {"type": "Fill-in-Blank", "q": "Fill in the blank: Iron rusting is a ___ change.", "choices": ["physical", "temporary", "reversible", "chemical"], "ans": 3, "exp": "The correct word is: chemical"}, {"type": "Synonym", "q": "Choose the word closest in meaning to '<b>reward</b>':", "choices": ["obedient", "magical", "prize", "kind"], "ans": 2, "exp": "'reward' is synonymous with 'prize'."}, {"type": "Match", "q": "Match: Ashoka → Kalinga War", "choices": ["Kalinga War", "Kurukshetra War", "Plassey War", "Panipat War"], "ans": 0, "exp": "Correct match: Kalinga War"}, {"type": "Synonym", "q": "Choose the word closest in meaning to '<b>kind</b>':", "choices": ["compassionate", "magical", "reward", "obedient"], "ans": 0, "exp": "'kind' is synonymous with 'compassionate'."}, {"type": "Fill-in-Blank", "q": "Fill in the blank: HCF of 12 and 18 is ___.", "choices": ["9", "6", "12", "3"], "ans": 1, "exp": "The correct word is: 6"}, {"type": "Fill-in-Blank", "q": "Fill in the blank: Animals that eat only plants are called ___.", "choices": ["carnivores", "omnivores", "scavengers", "herbivores"], "ans": 3, "exp": "The correct word is: herbivores"}, {"type": "Match", "q": "Match: Mercury → Nearest planet to Sun", "choices": ["Farthest planet", "Largest planet", "Slowest planet", "Nearest planet to Sun"], "ans": 3, "exp": "Correct match: Nearest planet to Sun"}, {"type": "Reading", "q": "<i>Passage:</i> The water cycle is the continuous movement of water on, above, and below the surface of the Earth. Water evaporates from seas, rivers, and lakes. It rises as water vapour and forms clouds. When clouds become heavy, water falls as rain, hail, or snow, completing the cycle.<br><br><b>Q: What is the water cycle?</b>", "choices": ["Rotation of Earth", "Cycle of seasons", "Continuous movement of water on Earth", "Movement of air"], "ans": 2, "exp": "Answer: Continuous movement of water on Earth"}, {"type": "Match", "q": "Match: Heart → Pumps blood", "choices": ["Controls nerves", "Filters blood", "Digests food", "Pumps blood"], "ans": 3, "exp": "Correct match: Pumps blood"}, {"type": "Assertion & Reasoning", "q": "<b>Assertion & Reasoning:</b><br>Assertion (A): The Earth is the centre of the solar system.\nReason (R): All planets revolve around the Sun.", "choices": ["Both A and R are true and R is the correct explanation", "A is true but R is false", "A is false but R is true", "Both A and R are false"], "ans": 2, "exp": "A is false but R is true"}, {"type": "Match", "q": "Match: Cow → Herbivore", "choices": ["Carnivore", "Herbivore", "Omnivore", "Scavenger"], "ans": 1, "exp": "Correct match: Herbivore"}, {"type": "MCQ", "q": "Taro was a _____ woodcutter.", "choices": ["rich", "old", "lazy", "young"], "ans": 3, "exp": "The correct answer is: young"}, {"type": "True/False", "q": "True or False: 0 is a natural number.", "choices": ["True", "False"], "ans": 1, "exp": "This statement is False."}, {"type": "True/False", "q": "True or False: Plants make their own food through photosynthesis.", "choices": ["True", "False"], "ans": 0, "exp": "This statement is True."}, {"type": "Synonym", "q": "Choose the word closest in meaning to '<b>obedient</b>':", "choices": ["reward", "magical", "kind", "dutiful"], "ans": 3, "exp": "'obedient' is synonymous with 'dutiful'."}, {"type": "Match", "q": "Match: Rigveda → Oldest Veda", "choices": ["Epic", "Newest Veda", "Oldest Veda", "Purana"], "ans": 2, "exp": "Correct match: Oldest Veda"}, {"type": "True/False", "q": "True or False: The largest planet is Saturn.", "choices": ["True", "False"], "ans": 1, "exp": "This statement is False."}, {"type": "Fill-in-Blank", "q": "Fill in the blank: The process of water turning into vapour is called ___.", "choices": ["melting", "freezing", "evaporation", "condensation"], "ans": 2, "exp": "The correct word is: evaporation"}, {"type": "Match", "q": "Match: Lion → Carnivore", "choices": ["Scavenger", "Carnivore", "Herbivore", "Omnivore"], "ans": 1, "exp": "Correct match: Carnivore"}, {"type": "MCQ", "q": "Taro worked hard to buy _____ for his father.", "choices": ["medicine", "food", "clothes", "sake"], "ans": 3, "exp": "The correct answer is: sake"}, {"type": "Antonym", "q": "Choose the word <b>opposite</b> in meaning to '<b>reward</b>':", "choices": ["punishment", "cruel", "generous", "ordinary"], "ans": 0, "exp": "The antonym of 'reward' is 'punishment'."}, {"type": "MCQ", "q": "A magical _____ appeared for Taro.", "choices": ["river", "lake", "waterfall", "pond"], "ans": 2, "exp": "The correct answer is: waterfall"}, {"type": "MCQ (6 choices)", "q": "Identify the INCORRECT pair: Planet → Order from Sun", "choices": ["Mercury-1st", "Venus-2nd", "Earth-4th", "Mars-4th", "Jupiter-5th", "Saturn-6th"], "ans": 2, "exp": "Earth is the 3rd planet from the Sun, not 4th."}, {"type": "MCQ (6 choices)", "q": "Arrange in ASCENDING order: 1/2, 1/3, 1/4, 1/5, 1/6, 1 — Which is the LARGEST?", "choices": ["1", "1/2", "1/3", "1/4", "1/5", "1/6"], "ans": 0, "exp": "1 (the whole) is the largest value."}, {"type": "True/False", "q": "True or False: Sound travels faster than light.", "choices": ["True", "False"], "ans": 1, "exp": "This statement is False."}, {"type": "MCQ", "q": "The Emperor rewarded Taro because of his _____.", "choices": ["richness", "obedience and kindness", "cleverness", "strength"], "ans": 1, "exp": "The correct answer is: obedience and kindness"}, {"type": "True/False", "q": "True or False: All metals are good conductors of electricity.", "choices": ["True", "False"], "ans": 0, "exp": "This statement is True."}, {"type": "True/False", "q": "True or False: The Earth revolves around the Moon.", "choices": ["True", "False"], "ans": 1, "exp": "This statement is False."}, {"type": "Fill-in-Blank", "q": "Fill in the blank: A triangle has ___ sides.", "choices": ["6", "3", "5", "4"], "ans": 1, "exp": "The correct word is: 3"}, {"type": "Antonym", "q": "Choose the word <b>opposite</b> in meaning to '<b>obedient</b>':", "choices": ["generous", "disobedient", "ordinary", "cruel"], "ans": 1, "exp": "The antonym of 'obedient' is 'disobedient'."}, {"type": "Fill-in-Blank", "q": "Fill in the blank: The standard unit of length is the ___.", "choices": ["kilogram", "metre", "litre", "second"], "ans": 1, "exp": "The correct word is: metre"}, {"type": "Fill-in-Blank", "q": "Fill in the blank: The ___ is an important part of a plant that absorbs water.", "choices": ["leaf", "flower", "root", "stem"], "ans": 2, "exp": "The correct word is: root"}, {"type": "Synonym", "q": "Choose the word closest in meaning to '<b>magical</b>':", "choices": ["obedient", "kind", "reward", "enchanted"], "ans": 3, "exp": "'magical' is synonymous with 'enchanted'."}, {"type": "Match", "q": "Match: Buddha → Enlightenment at Bodh Gaya", "choices": ["Enlightenment at Bodh Gaya", "Death at Sarnath", "First sermon at Vaishali", "Birth at Kapilavastu"], "ans": 0, "exp": "Correct match: Enlightenment at Bodh Gaya"}, {"type": "Spell Check", "q": "Which of these is spelled <b>correctly</b>?", "choices": ["photosynthesis", "fotosynthesis", "phothosynthesis", "photosynthasis"], "ans": 0, "exp": "'photosynthesis' is the correct spelling."}, {"type": "Antonym", "q": "Choose the word <b>opposite</b> in meaning to '<b>selfish</b>':", "choices": ["ordinary", "generous", "punishment", "cruel"], "ans": 1, "exp": "The antonym of 'selfish' is 'generous'."}, {"type": "MCQ (5 choices)", "q": "Which layer of the Earth is the outermost?", "choices": ["Crust", "Mantle", "Outer Core", "Inner Core", "Lithosphere"], "ans": 0, "exp": "The crust (or lithosphere) is the outermost layer."}, {"type": "True/False", "q": "True or False: Water is a compound.", "choices": ["True", "False"], "ans": 0, "exp": "This statement is True."}, {"type": "Assertion & Reasoning", "q": "<b>Assertion & Reasoning:</b><br>Assertion (A): Iron is a good conductor of electricity.\nReason (R): Metals have free electrons that carry electric current.", "choices": ["Both A and R are true and R is the correct explanation of A", "A is false but R is true", "Both A and R are false", "A is true but R is false"], "ans": 0, "exp": "Both A and R are true and R is the correct explanation of A"}, {"type": "True/False", "q": "True or False: The Sun is a planet.", "choices": ["True", "False"], "ans": 1, "exp": "This statement is False."}, {"type": "Assertion & Reasoning", "q": "<b>Assertion & Reasoning:</b><br>Assertion (A): Pure water is a good conductor of electricity.\nReason (R): Pure water lacks ions to carry current.", "choices": ["Both A and R are false", "A is false but R is true", "Both A and R are true", "A is true but R is false"], "ans": 1, "exp": "A is false but R is true"}, {"type": "MCQ (5 choices)", "q": "Which of the following is NOT a renewable energy source?", "choices": ["Solar", "Wind", "Coal", "Hydro", "Biomass"], "ans": 2, "exp": "Coal is a non-renewable fossil fuel."}, {"type": "Spell Check", "q": "Which of these is spelled <b>correctly</b>?", "choices": ["arithmetic", "arithmatic", "arithemtic", "arithmitic"], "ans": 0, "exp": "'arithmetic' is the correct spelling."}, {"type": "MCQ (5 choices)", "q": "Which one of the following is a PHYSICAL change?", "choices": ["Cutting paper", "Burning wood", "Rusting iron", "Cooking food", "Souring milk"], "ans": 0, "exp": "Cutting paper is a physical change; shape changes but not chemical composition."}, {"type": "Reading", "q": "<i>Passage:</i> Mahatma Gandhi was born on October 2, 1869. He is called the Father of the Nation. He led India's independence movement through non-violence and civil disobedience. His philosophy of 'Ahimsa' (non-violence) inspired movements around the world.<br><br><b>Q: Gandhi's philosophy of non-violence is called _____.</b>", "choices": ["Dharma", "Karma", "Satyagraha", "Ahimsa"], "ans": 3, "exp": "Answer: Ahimsa"}, {"type": "Assertion & Reasoning", "q": "<b>Assertion & Reasoning:</b><br>Assertion (A): Sound requires a medium to travel.\nReason (R): Sound is a mechanical wave.", "choices": ["A is false but R is true", "Both A and R are true and R is the correct explanation of A", "A is true but R is false", "Both A and R are false"], "ans": 1, "exp": "Both A and R are true and R is the correct explanation of A"}, {"type": "MCQ", "q": "Neighbours who tried to use the waterfall got only _____.", "choices": ["wine", "sake", "cold water", "nothing"], "ans": 2, "exp": "The correct answer is: cold water"}, {"type": "True/False", "q": "True or False: Fractions can be added only when denominators are same.", "choices": ["True", "False"], "ans": 0, "exp": "This statement is True."}, {"type": "MCQ (5 choices)", "q": "Which property allows iron to be used for making tools?", "choices": ["Hardness", "Ductility", "Malleability", "Conductivity", "Lustre"], "ans": 0, "exp": "Hardness makes iron suitable for cutting tools."}, {"type": "Spell Check", "q": "Which of these is spelled <b>correctly</b>?", "choices": ["accommodation", "acomodation", "accomodation", "acommodation"], "ans": 0, "exp": "'accommodation' is the correct spelling."}, {"type": "Reading", "q": "<i>Passage:</i> Mahatma Gandhi was born on October 2, 1869. He is called the Father of the Nation. He led India's independence movement through non-violence and civil disobedience. His philosophy of 'Ahimsa' (non-violence) inspired movements around the world.<br><br><b>Q: Gandhi was born on October _____, 1869.</b>", "choices": ["15", "26", "2", "1"], "ans": 2, "exp": "Answer: 2"}, {"type": "Fill-in-Blank", "q": "Fill in the blank: The currency of India is the ___.", "choices": ["Dollar", "Rupee", "Pound", "Euro"], "ans": 1, "exp": "The correct word is: Rupee"}, {"type": "Assertion & Reasoning", "q": "<b>Assertion & Reasoning:</b><br>Assertion (A): Plants need sunlight to make food.\nReason (R): Sunlight is used in photosynthesis.", "choices": ["Both A and R are true and R is the correct explanation of A", "A is true but R is false", "Both A and R are true but R is NOT the correct explanation", "A is false but R is true"], "ans": 0, "exp": "Both A and R are true and R is the correct explanation of A"}, {"type": "Antonym", "q": "Choose the word <b>opposite</b> in meaning to '<b>magical</b>':", "choices": ["generous", "ordinary", "punishment", "cruel"], "ans": 1, "exp": "The antonym of 'magical' is 'ordinary'."}, {"type": "Synonym", "q": "Choose the word closest in meaning to '<b>selfish</b>':", "choices": ["magical", "kind", "reward", "greedy"], "ans": 3, "exp": "'selfish' is synonymous with 'greedy'."}, {"type": "MCQ (5 choices)", "q": "Which of these is a PRIMARY source of history?", "choices": ["Inscriptions", "Textbooks", "Novels", "News articles", "Encyclopaedia"], "ans": 0, "exp": "Inscriptions are primary sources written at the time of the event."}, {"type": "True/False", "q": "True or False: Silk is a natural fibre.", "choices": ["True", "False"], "ans": 0, "exp": "This statement is True."}, {"type": "Antonym", "q": "Choose the word <b>opposite</b> in meaning to '<b>kind</b>':", "choices": ["cruel", "punishment", "generous", "ordinary"], "ans": 0, "exp": "The antonym of 'kind' is 'cruel'."}, {"type": "Reading", "q": "<i>Passage:</i> The lion is known as the King of the Jungle. It is a carnivore and lives in grasslands and savannas. Lions live in groups called prides. Female lions (lionesses) do most of the hunting. A lion's roar can be heard from 8 kilometres away.<br><br><b>Q: Lions are classified as _____.</b>", "choices": ["carnivores", "omnivores", "herbivores", "scavengers"], "ans": 0, "exp": "Answer: carnivores"}, {"type": "Fill-in-Blank", "q": "Fill in the blank: 60 minutes = ___ hour.", "choices": ["2", "12", "1", "30"], "ans": 2, "exp": "The correct word is: 1"}, {"type": "MCQ (5 choices)", "q": "Who among these is NOT a Buddhist concept?", "choices": ["Nirvana", "Ahimsa", "Karma", "Samsara", "Jihad"], "ans": 4, "exp": "Jihad is an Islamic concept, not Buddhist."}, {"type": "Match", "q": "Match: Equator → 0° latitude", "choices": ["90°N latitude", "180° longitude", "0° latitude", "23.5°N latitude"], "ans": 2, "exp": "Correct match: 0° latitude"}, {"type": "Fill-in-Blank", "q": "Fill in the blank: The natural satellite of Earth is the ___.", "choices": ["Moon", "Mars", "Sun", "Venus"], "ans": 0, "exp": "The correct word is: Moon"}, {"type": "Fill-in-Blank", "q": "Fill in the blank: Iron rusting is a ___ change.", "choices": ["physical", "temporary", "reversible", "chemical"], "ans": 3, "exp": "The correct word is: chemical"}, {"type": "Spell Check", "q": "Which of these is spelled <b>correctly</b>?", "choices": ["necessary", "necesary", "neccesary", "necesary"], "ans": 0, "exp": "'necessary' is the correct spelling."}, {"type": "Spell Check", "q": "Which of these is spelled <b>correctly</b>?", "choices": ["beautiful", "beatiful", "beautifull", "beutiful"], "ans": 0, "exp": "'beautiful' is the correct spelling."}, {"type": "Reading", "q": "<i>Passage:</i> Mahatma Gandhi was born on October 2, 1869. He is called the Father of the Nation. He led India's independence movement through non-violence and civil disobedience. His philosophy of 'Ahimsa' (non-violence) inspired movements around the world.<br><br><b>Q: Mahatma Gandhi is called the _____ of the Nation.</b>", "choices": ["Leader", "King", "Emperor", "Father"], "ans": 3, "exp": "Answer: Father"}, {"type": "Synonym", "q": "Choose the word closest in meaning to '<b>reward</b>':", "choices": ["obedient", "magical", "prize", "kind"], "ans": 2, "exp": "'reward' is synonymous with 'prize'."}, {"type": "Match", "q": "Match: Ashoka → Kalinga War", "choices": ["Kalinga War", "Kurukshetra War", "Plassey War", "Panipat War"], "ans": 0, "exp": "Correct match: Kalinga War"}, {"type": "Spell Check", "q": "Which of these is spelled <b>correctly</b>?", "choices": ["environment", "enviroment", "environement", "enviorment"], "ans": 0, "exp": "'environment' is the correct spelling."}, {"type": "Synonym", "q": "Choose the word closest in meaning to '<b>kind</b>':", "choices": ["compassionate", "magical", "reward", "obedient"], "ans": 0, "exp": "'kind' is synonymous with 'compassionate'."}, {"type": "Spell Check", "q": "Which of these is spelled <b>correctly</b>?", "choices": ["calendar", "calender", "calandar", "callendar"], "ans": 0, "exp": "'calendar' is the correct spelling."}, {"type": "Fill-in-Blank", "q": "Fill in the blank: HCF of 12 and 18 is ___.", "choices": ["9", "6", "12", "3"], "ans": 1, "exp": "The correct word is: 6"}, {"type": "Fill-in-Blank", "q": "Fill in the blank: Animals that eat only plants are called ___.", "choices": ["carnivores", "omnivores", "scavengers", "herbivores"], "ans": 3, "exp": "The correct word is: herbivores"}];
+const LEVEL="hard";
+const TIMERS={easy:30,moderate:25,hard:20,supernatural:15};
+const REWARDS=["🌟 Superb!","🎉 Excellent!","✨ Brilliant!","🔥 Amazing!","💫 Perfect!","👑 Outstanding!","⚡ Fantastic!","🏆 Great job!"];
+
+let cur=0,score=0,answered=[],timer=null,timeLeft=0;
+
+// Stars
+const sc=document.getElementById('stars');
+for(let i=0;i<80;i++){
+  const s=document.createElement('div');
+  s.className='star';
+  const sz=Math.random()*3+1;
+  s.style.cssText=`width:${sz}px;height:${sz}px;left:${Math.random()*100}%;top:${Math.random()*100}%;--d:${2+Math.random()*4}s;opacity:${Math.random()*.5}`;
+  sc.appendChild(s);
+}
+
+// Level icon
+const icons={easy:'🌱',moderate:'🔥',hard:'⚡',supernatural:'👁️'};
+document.getElementById('levelIcon').textContent=icons[LEVEL]||'🎯';
+
+function show(id){['introScreen','quizScreen','scoreScreen'].forEach(s=>document.getElementById(s).classList.remove('active'));document.getElementById(id).classList.add('active');}
+
+function startQuiz(){
+  answered=new Array(QUESTIONS.length).fill(null);
+  cur=0;score=0;
+  show('quizScreen');
+  renderQ();
+}
+
+function renderQ(){
+  const q=QUESTIONS[cur];
+  const total=QUESTIONS.length;
+  document.getElementById('progBar').style.width=((cur/total)*100)+'%';
+  document.getElementById('progTxt').textContent=`Question ${cur+1} of ${total}`;
+  document.getElementById('scoreDisp').textContent=`Score: ${score}`;
+  document.getElementById('qType').textContent=q.type;
+  document.getElementById('qNum').textContent=`Q${cur+1}`;
+  document.getElementById('qText').innerHTML=q.q;
+  const fb=document.getElementById('feedback');
+  fb.className='feedback';fb.textContent='';
+  const ch=document.getElementById('choices');
+  ch.innerHTML='';
+  const labels='ABCDEF';
+  q.choices.forEach((c,i)=>{
+    const div=document.createElement('div');
+    div.className='choice';
+    div.innerHTML=`<div class="choice-letter">${labels[i]}</div><div>${c}</div>`;
+    if(answered[cur]!==null){
+      if(i===q.ans)div.classList.add('correct');
+      else if(i===answered[cur])div.classList.add('wrong');
+    }else{
+      div.onclick=()=>selectAnswer(i);
+    }
+    ch.appendChild(div);
+  });
+  document.getElementById('prevBtn').style.opacity=cur===0?'.3':'1';
+  document.getElementById('nextBtn').textContent=cur===QUESTIONS.length-1?'Finish ✅':'Next →';
+  clearInterval(timer);
+  if(answered[cur]===null)startTimer();
+}
+
+function startTimer(){
+  timeLeft=TIMERS[LEVEL]||30;
+  const el=document.getElementById('timerNum');
+  const wrap=document.getElementById('timerEl');
+  el.textContent=timeLeft;
+  wrap.className='timer';
+  timer=setInterval(()=>{
+    timeLeft--;el.textContent=timeLeft;
+    if(timeLeft<=5)wrap.className='timer danger';
+    else if(timeLeft<=10)wrap.className='timer warn';
+    if(timeLeft<=0){clearInterval(timer);autoSkip();}
+  },1000);
+}
+
+function autoSkip(){
+  if(answered[cur]===null){answered[cur]=-1;showFeedback(false,"⏰ Time's up! Moving on...");setTimeout(nextQ,1200);}
+}
+
+function selectAnswer(i){
+  if(answered[cur]!==null)return;
+  clearInterval(timer);
+  answered[cur]=i;
+  const q=QUESTIONS[cur];
+  const correct=i===q.ans;
+  if(correct){score++;showReward();}
+  document.querySelectorAll('.choice').forEach((c,idx)=>{
+    if(idx===q.ans)c.classList.add('correct');
+    else if(idx===i&&!correct)c.classList.add('wrong');
+    c.onclick=null;
+  });
+  showFeedback(correct,q.exp||'');
+  document.getElementById('scoreDisp').textContent=`Score: ${score}`;
+  if(cur===QUESTIONS.length-1)setTimeout(finish,1500);else setTimeout(nextQ,1500);
+}
+
+function showFeedback(ok,msg){
+  const fb=document.getElementById('feedback');
+  fb.className=`feedback show ${ok?'ok':'err'}`;
+  fb.textContent=ok?`✅ Correct! ${msg}`:`❌ ${msg||'Wrong answer.'}`;
+}
+
+function nextQ(){if(cur<QUESTIONS.length-1){cur++;renderQ();}else finish();}
+function prevQ(){if(cur>0){cur--;renderQ();}}
+
+function finish(){
+  clearInterval(timer);
+  show('scoreScreen');
+  const pct=Math.round((score/QUESTIONS.length)*100);
+  document.getElementById('finalScore').textContent=score;
+  document.getElementById('stCorr').textContent=score;
+  document.getElementById('stWrong').textContent=QUESTIONS.length-score;
+  document.getElementById('stPct').textContent=pct+'%';
+  const msgs=[
+    [90,'🏆 Masterful! You nailed it!'],
+    [70,'🌟 Great performance!'],
+    [50,'👍 Good effort, keep practicing!'],
+    [0,'💪 Keep studying, you can do better!']
+  ];
+  document.getElementById('resultMsg').textContent=msgs.find(m=>pct>=m[0])[1];
+  if(pct>=70)launchConfetti();
+}
+
+function showReward(){
+  const el=document.getElementById('rewardText');
+  el.style.color=getComputedStyle(document.documentElement).getPropertyValue('--accent').trim();
+  el.textContent=REWARDS[Math.floor(Math.random()*REWARDS.length)];
+  el.className='reward-text show';
+  setTimeout(()=>{el.className='reward-text hide';setTimeout(()=>el.className='reward-text',500);},900);
+  launchMiniConfetti();
+}
+
+function launchMiniConfetti(){spawnConfetti(40);}
+function launchConfetti(){spawnConfetti(150);}
+
+function spawnConfetti(n){
+  const canvas=document.getElementById('confettiCanvas');
+  canvas.width=window.innerWidth;canvas.height=window.innerHeight;
+  const ctx=canvas.getContext('2d');
+  const pieces=[];
+  const cols=['#f59e0b','#22c55e','#3b82f6','#a855f7','#ef4444','#06b6d4','#fbbf24'];
+  for(let i=0;i<n;i++){
+    pieces.push({x:Math.random()*canvas.width,y:-10,w:8+Math.random()*8,h:12+Math.random()*12,col:cols[Math.floor(Math.random()*cols.length)],vx:(Math.random()-.5)*6,vy:3+Math.random()*5,rot:Math.random()*360,rv:(Math.random()-.5)*10});
+  }
+  let frame;
+  function draw(){
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    pieces.forEach((p,i)=>{
+      ctx.save();ctx.translate(p.x,p.y);ctx.rotate(p.rot*Math.PI/180);
+      ctx.fillStyle=p.col;ctx.fillRect(-p.w/2,-p.h/2,p.w,p.h);ctx.restore();
+      p.x+=p.vx;p.y+=p.vy;p.rot+=p.rv;p.vy+=.15;
+    });
+    if(pieces.some(p=>p.y<canvas.height+20))frame=requestAnimationFrame(draw);
+    else ctx.clearRect(0,0,canvas.width,canvas.height);
+  }
+  draw();
+}
+</script>
+</body>
+</html>
