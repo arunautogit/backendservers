@@ -61,36 +61,77 @@ function buildCatalog(baseUrl) {
     for (const subjectName of subjects) {
       const subjectDir = path.join(classDir, subjectName);
       const files = listFiles(subjectDir);
-      const pdfs = files.filter((f) => f.toLowerCase().endsWith('.pdf')).sort();
+      const makeUrl = (fileName) =>
+        `${baseUrl}/books/${encodeURIComponent(classEntry.folder)}/${encodeURIComponent(subjectName)}/${encodeURIComponent(fileName)}`;
 
-      for (const pdfFile of pdfs) {
-        const base = pdfFile.substring(0, pdfFile.length - 4);
-        const htmlByLevel = {
-          easy: `${base}_easy.html`,
-          moderate: `${base}_moderate.html`,
-          hard: `${base}_hard.html`,
-          supernatural: `${base}_supernatural.html`,
-          superantural: `${base}_superantural.html`
-        };
+      // Build fast lookup for case-insensitive filename matching.
+      const byLower = new Map();
+      for (const fileName of files) {
+        byLower.set(fileName.toLowerCase(), fileName);
+      }
 
-        const makeUrl = (fileName) => `${baseUrl}/books/${encodeURIComponent(classEntry.folder)}/${encodeURIComponent(subjectName)}/${encodeURIComponent(fileName)}`;
+      const chapterMap = new Map();
+      const pdfNames = files
+        .filter((f) => f.toLowerCase().endsWith('.pdf'))
+        .sort((a, b) => a.localeCompare(b));
 
-        const quiz = {
-          easy: files.includes(htmlByLevel.easy) ? makeUrl(htmlByLevel.easy) : null,
-          moderate: files.includes(htmlByLevel.moderate) ? makeUrl(htmlByLevel.moderate) : null,
-          hard: files.includes(htmlByLevel.hard) ? makeUrl(htmlByLevel.hard) : null,
-          supernatural: files.includes(htmlByLevel.supernatural)
-            ? makeUrl(htmlByLevel.supernatural)
-            : (files.includes(htmlByLevel.superantural) ? makeUrl(htmlByLevel.superantural) : null)
-        };
+      for (const pdfName of pdfNames) {
+        const base = pdfName.replace(/\.pdf$/i, '');
+        if (!chapterMap.has(base)) {
+          chapterMap.set(base, {
+            chapterCode: base,
+            pdfFile: pdfName,
+            easy: null,
+            moderate: null,
+            hard: null,
+            supernatural: null
+          });
+        } else {
+          chapterMap.get(base).pdfFile = pdfName;
+        }
+      }
 
+      const htmlRegex = /^(.+?)_(easy|moderate|hard|supernatural|superantural)\.html$/i;
+      for (const fileName of files) {
+        const match = fileName.match(htmlRegex);
+        if (!match) continue;
+
+        const base = match[1];
+        const rawLevel = match[2].toLowerCase();
+        const level = rawLevel === 'superantural' ? 'supernatural' : rawLevel;
+
+        if (!chapterMap.has(base)) {
+          const exactPdf = byLower.get(`${base}.pdf`.toLowerCase()) || null;
+          chapterMap.set(base, {
+            chapterCode: base,
+            pdfFile: exactPdf,
+            easy: null,
+            moderate: null,
+            hard: null,
+            supernatural: null
+          });
+        }
+
+        chapterMap.get(base)[level] = fileName;
+      }
+
+      const chapters = Array.from(chapterMap.values())
+        .filter((chapter) => chapter.pdfFile) // Reading requires PDF.
+        .sort((a, b) => a.chapterCode.localeCompare(b.chapterCode, undefined, { numeric: true, sensitivity: 'base' }));
+
+      for (const chapter of chapters) {
         items.push({
           classLevel: classEntry.classLevel,
           subjectName,
-          chapterCode: base,
-          chapterTitle: prettify(base),
-          pdfUrl: makeUrl(pdfFile),
-          quiz
+          chapterCode: chapter.chapterCode,
+          chapterTitle: prettify(chapter.chapterCode),
+          pdfUrl: makeUrl(chapter.pdfFile),
+          quiz: {
+            easy: chapter.easy ? makeUrl(chapter.easy) : null,
+            moderate: chapter.moderate ? makeUrl(chapter.moderate) : null,
+            hard: chapter.hard ? makeUrl(chapter.hard) : null,
+            supernatural: chapter.supernatural ? makeUrl(chapter.supernatural) : null
+          }
         });
       }
     }
