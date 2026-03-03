@@ -21,12 +21,26 @@ function exists(p) {
 
 function listFiles(dir) {
   if (!exists(dir)) return [];
-  return fs.readdirSync(dir, { withFileTypes: true }).filter((d) => d.isFile()).map((d) => d.name);
+  try {
+    return fs.readdirSync(dir, { withFileTypes: true })
+      .filter((d) => d.isFile() || (d.isSymbolicLink() && fs.statSync(path.join(dir, d.name)).isFile()))
+      .map((d) => d.name);
+  } catch (e) {
+    console.error(`Error listing files in ${dir}:`, e.message);
+    return [];
+  }
 }
 
 function listDirs(dir) {
   if (!exists(dir)) return [];
-  return fs.readdirSync(dir, { withFileTypes: true }).filter((d) => d.isDirectory()).map((d) => d.name);
+  try {
+    return fs.readdirSync(dir, { withFileTypes: true })
+      .filter((d) => d.isDirectory() || (d.isSymbolicLink() && fs.statSync(path.join(dir, d.name)).isDirectory()))
+      .map((d) => d.name);
+  } catch (e) {
+    console.error(`Error listing directories in ${dir}:`, e.message);
+    return [];
+  }
 }
 
 function prettify(name) {
@@ -53,10 +67,14 @@ function buildCatalog(baseUrl) {
   ];
 
   const items = [];
+  console.log(`Building catalog using base: ${baseUrl}, BOOKS_ROOT: ${BOOKS_ROOT}`);
 
   for (const classEntry of classMap) {
     const classDir = path.join(BOOKS_ROOT, classEntry.folder);
     const subjects = listDirs(classDir);
+    if (subjects.length === 0) {
+      console.warn(`No subjects found in ${classDir}`);
+    }
 
     for (const subjectName of subjects) {
       const subjectDir = path.join(classDir, subjectName);
@@ -137,6 +155,7 @@ function buildCatalog(baseUrl) {
     }
   }
 
+  console.log(`Catalog built with ${items.length} items`);
   return { items, generatedAt: new Date().toISOString() };
 }
 
@@ -151,7 +170,7 @@ app.get('/api/catalog', (req, res) => {
 
 app.use('/books', express.static(BOOKS_ROOT));
 
-app.listen(PORT, () => {
+app.listen(PORT, '0.0.0.0', () => {
   console.log(`LearningTV backend running on port ${PORT}`);
   if (FORCE_HOST) {
     console.log(`Using forced HOST base URL: ${FORCE_HOST}`);
